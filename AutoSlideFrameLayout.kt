@@ -44,11 +44,11 @@ class AutoSlideFrameLayout(context: Context) : FrameLayout(context), Runnable, V
             when (e.action) {
                 MotionEvent.ACTION_UP -> {
                     isSlideEnabled = true
-                    handler.postDelayed(this, SLIDE_INTERVAL)
+                    mHandler.postDelayed(this, SLIDE_INTERVAL)
                 }
                 else -> {
                     isSlideEnabled = false
-                    handler.removeCallbacks(this)
+                    mHandler.removeCallbacks(this)
                 }
             }
         }
