@@ -1,4 +1,4 @@
-package com.autoslide
+package kr.co.autoslide.viewpager
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,34 +9,38 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 import androidx.viewpager.widget.ViewPager
+import java.util.*
 
-class AutoSlideFrameLayout(context: Context) : FrameLayout(context), Runnable, View.OnTouchListener {
+class AutoSlideViewPager(context: Context) : FrameLayout(context), Runnable, View.OnTouchListener {
     companion object {
         const val SLIDE_INTERVAL = 3000L
     }
 
     private val mHandler = Handler(Looper.getMainLooper())
     private lateinit var mViewPager: ViewPager
+    private var items: List<String>? = null
     private var isSlideEnabled = true
     private var direction = 1
 
     @SuppressLint("ClickableViewAccessibility")
     private fun create() {
-        mViewPager = ViewPager(context)
-        val adapter = ViewPagerAdapter(context)
+        items?.let { items ->
+            mViewPager = ViewPager(context)
+            val adapter = ViewPagerAdapter(context, items)
 
-        mViewPager.apply {
-            this.overScrollMode = OVER_SCROLL_IF_CONTENT_SCROLLS
-            this.id = ViewCompat.generateViewId()
-            this.adapter = adapter
-            this.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+            mViewPager.apply {
+                this.overScrollMode = OVER_SCROLL_IF_CONTENT_SCROLLS
+                this.id = ViewCompat.generateViewId()
+                this.adapter = adapter
+                this.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+            }
+
+            mViewPager.setOnTouchListener(this)
+
+            this.addView(mViewPager)
+
+            mHandler.postDelayed(this, SLIDE_INTERVAL)
         }
-
-        mViewPager.setOnTouchListener(this)
-
-        this.addView(mViewPager)
-
-        mHandler.postDelayed(this, SLIDE_INTERVAL)
     }
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
@@ -74,5 +78,8 @@ class AutoSlideFrameLayout(context: Context) : FrameLayout(context), Runnable, V
         }
     }
 
-    init { create() }
+    constructor(context: Context, items: List<String>) : this(context) {
+        this.items = items
+        create()
+    }
 }
